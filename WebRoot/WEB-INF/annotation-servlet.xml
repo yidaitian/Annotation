@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       
+       
+       xmlns:util="http://www.springframework.org/schema/util" 
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+	   xmlns:tx="http://www.springframework.org/schema/tx" 
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   
+
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-2.5.xsd
+        
+        
+        
+        http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+		http://www.springframework.org/schema/aop  
+		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd 
+		http://www.springframework.org/schema/util 
+		http://www.springframework.org/schema/util/spring-util-3.0.xsd
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        
+        
+        
+        ">
+    <!-- Enable annotation component scanning and autowiring of web package -->
+    <context:annotation-config />
+    <context:component-scan base-package="org.intellifai.annotation"/>
+    
+    <!-- Required for security annotations to work in this servlet -->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor"/>
+    
+    <!-- Enable annotation-based controllers using @Controller annotations -->
+    <bean id="annotationUrlMapping"
+          class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+        <property name="interceptors" ref="currentUserInterceptor"/>
+    </bean>
+
+    <bean id="annotationMethodHandlerAdapter"
+          class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter"/>
+
+	<bean id="exceptionResolver"
+	    class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+	    <property name="defaultErrorView">
+	       <value>unknown</value>
+	    </property>
+	    <property name="exceptionMappings">
+	       <props>
+	           <prop key="java.lang.RuntimeException">errorRT</prop>
+	           <prop key="org.apache.shiro.authz.UnauthorizedException">unauthorized</prop>
+	       </props>
+	    </property>
+	</bean>
+	
+	<!-- 视图解析 -->
+	<!-- All views are JSPs loaded from /WEB-INF/jsp -->
+    <bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+        <property name="prefix" value="/WEB-INF/jsp/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+    
+    <mvc:annotation-driven />
+	<mvc:default-servlet-handler />
+	
+	<bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter" > 
+    	<property name = "supportedMediaTypes">    
+        	<list>    
+            	<value>text/plain;charset=UTF-8</value>    
+            </list>    
+        </property>  
+    </bean> 
+ </beans>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans 
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/tx 
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop 
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/util 
+       http://www.springframework.org/schema/util/spring-util.xsd
+       http://www.springframework.org/schema/context 
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/mvc 
+       http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd"
+       default-autowire="byName" default-lazy-init="true">
+       
+    <!-- Enable annotation configuration -->
+    <context:annotation-config/>
+    
+    <!-- Scan packages for Spring annotations -->
+    <context:component-scan base-package="org.intellifai.annotation"/>
+    
+    <!-- Spring AOP auto-proxy creation (required to support Shiro annotations) -->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"/>
+    
+    <!-- RDBMS data source that would exist in any application.-->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/annotation?characterEncoding=UTF-8"/>
+        <property name="username" value="root"/>
+        <property name="password" value="123456"/>
+    </bean>
+    
+    <!-- Hibernate SessionFactory -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!-- Scan packages for JPA annotations -->
+        <property name="packagesToScan" value="org.intellifai.annotation"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">false</prop>
+                <prop key="hibernate.cache.use_query_cache">true</prop>
+                <prop key="hibernate.jdbc.fetch_size">100</prop>
+                <prop key="hibernate.cache.provider_class">net.sf.ehcache.hibernate.SingletonEhCacheProvider</prop>
+                <prop key="hibernate.query.factory_class">org.hibernate.hql.classic.ClassicQueryTranslatorFactory</prop>
+            </props>
+        </property>
+        <property name="eventListeners">
+            <map>
+                <entry key="merge">
+                    <bean class="org.springframework.orm.hibernate3.support.IdTransferringMergeEventListener"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="widgetDAO" class="org.intellifai.annotation.dao.impl.HibernateWidgetDAO" />  
+	<bean id="widgetService" class="org.intellifai.annotation.service.impl.DefaultWidgetService">  
+	    <property name="widgetDAO" ref="widgetDAO"/>  
+	</bean>  
+	
+	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~Base DAO injection~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->  
+	<bean id="baseDao" class="org.intellifai.annotation.hibernate.BaseDaoImpl">  
+	    <property name="sessionFactory" ref="sessionFactory"/>  
+	</bean>  
+	<!-- Transaction support beans -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    
+    <!--@Transactional annotation transaction support-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+	
+    
+    <!-- =========================================================
+         Shiro Components
+         ========================================================= -->
+    <!-- Shiro's main business-tier object for web-enabled applications-->
+    <bean id="sessionDAO" class="org.apache.shiro.session.mgt.eis.MemorySessionDAO" />
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="hibernateRealm"/>
+    </bean>
+    <!-- Post processor that automatically invokes init() and destroy() methods -->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+    <!-- Define the Shiro Filter here (as a FactoryBean) instead of directly in web.xml -
+         web.xml uses the DelegatingFilterProxy to access this bean.  This allows us
+         to wire things with more control as well utilize nice Spring things such as
+         PropertiesPlaceholderConfigurer and abstract beans or anything else we might need: -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <property name="loginUrl" value="/s/user/login"/>
+        <property name="successUrl" value="/s/user/home"/>
+        <property name="unauthorizedUrl" value="/s/error/unauthorized"/>
+        <!-- The 'filters' property is usually not necessary unless performing an override, which we
+             want to do here (make authc point to a PassthruAuthenticationFilter instead of the
+             default FormAuthenticationFilter: -->
+        <property name="filters">
+            <util:map>
+                <entry key="authc">
+                    <bean class="org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter"/>
+                </entry>
+            </util:map>
+        </property>
+        <property name="filterChainDefinitions">
+            <value>
+                /s/user/login = anon
+                /s/** = authc
+            </value>
+        </property>
+    </bean> 
+       
+    <mvc:annotation-driven />
+    
+ </beans>

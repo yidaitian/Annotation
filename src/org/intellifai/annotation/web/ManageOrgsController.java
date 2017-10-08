@@ -116,6 +116,8 @@ public class ManageOrgsController {
     @RequiresPermissions("org:edit")
     public String showEditOrgForm(Model model, @RequestParam Integer OrgId, @ModelAttribute OrganizationCommand command) {
     	
+    	//try change
+    	
     	Organization org = orgService.getOrganization(OrgId);
     	command.setId(OrgId);
     	command.setName(org.getName());

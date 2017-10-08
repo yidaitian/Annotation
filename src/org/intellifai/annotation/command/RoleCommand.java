@@ -59,7 +59,8 @@ public class RoleCommand {
 	
 	public void updateRole(Role role) {
         Assert.isTrue( id.equals( role.getId() ), "Role ID of command must match the user being updated." );
-        role.setName(getName());
+        
+		role.setName(getName());
         role.setDescription(getDescription());
         Set<String> rSet = new HashSet<String>(Arrays.asList(getPermissions().split(",")));
         role.setPermissions(rSet);

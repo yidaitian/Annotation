@@ -5,7 +5,7 @@
 <html>
 <head>
 <title>智成标注系统</title>
-<jsp:include page="/inc/head.jsp"></jsp:include>  
+<jsp:include page="/inc/head.jsp"></jsp:include>
 <script type="text/javascript">
 if(top!=this) {
    top.location=this.location;
@@ -19,11 +19,11 @@ if(top!=this) {
 	<div><form:errors path="*" element="div" cssClass="notif tip close"/></div>
           <div class="input placeholder">
 		      <label for="login">用户名</label>
-		      <form:input path="username"/>
+		      <form:input path="username" value="admin"/>
 		  </div>
 		  <div class="input placeholder">
 		      <label for="pass">密 码</label>
-		      <form:password path="password"/>
+		      <form:password path="password" value="1"/>
 	      </div>
           <div class="checkbox">
 		      <form:checkbox path="rememberMe"/>

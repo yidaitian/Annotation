@@ -193,9 +193,9 @@ public class ManageRolesController {
 	
 	 @RequestMapping(value="role/editRole",method= RequestMethod.POST)
      @RequiresPermissions("role:edit")
-     public String editRole(Model model, @RequestParam Integer roleId, @ModelAttribute RoleCommand command) {
+     public String editRole(Model model, @RequestParam Integer roleId, @ModelAttribute RoleCommand roleCommand) {
 		Role role = roleService.getRole( roleId );
-        command.updateRole( role );
+		roleCommand.updateRole( role );
         roleService.updateRole( role );
     	Notification notification =  new Notification();
         notification.setClassType(ConfigUtil.getConfig().getString("css.class.success"));

@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import javax.ws.rs.PathParam;
 
 /**
  * 类信息描述
@@ -74,13 +74,38 @@ public class ManageOrgsController {
         int pageSize = CookieUtils.getPageSize(request);
         //put Page object to request scope
     	model.addAttribute("Page", orgService.getPageOrganizations(currentPage, pageSize));
-    	log.debug("opened manage Org list page...");
+    	log.debug("opened manage organization list page...");
+    }
+    
+    @RequestMapping("org/deleteOrg")
+    @RequiresPermissions("org:delete")
+    public String deleteOrg(Model model, @RequestParam Integer... orgId) {
+    	int count = 0;
+    	for (Integer longId : orgId) {
+    		//this org can`t delete if any user related with it 
+    		if( userService.getUserByBelongOrg(longId).isEmpty() ){
+    			count++;
+    			orgService.deleteOrganization(longId);
+    		}
+		}
+    	Notification notification =  new Notification();
+    	if( count>0 ){
+    		notification.setClassType(ConfigUtil.getConfig().getString("css.class.success"));
+            notification.setTitle(ConfigUtil.getConfig().getString("msg.title.delete"));
+            notification.setMessage(ConfigUtil.getConfig().getString("msg.message.delete"));
+    	}else{
+    		notification.setClassType(ConfigUtil.getConfig().getString("css.class.tip"));
+            notification.setTitle(ConfigUtil.getConfig().getString("msg.title.org.delete.tip"));
+            notification.setMessage(ConfigUtil.getConfig().getString("msg.message.org.delete.tip"));
+    	}
+        model.addAttribute("Notification",notification);
+        return "forward:/s/org/manageOrgs";
     }
     
     /**
      * add new Org
      * @param model
-     * @param OrgCommand
+     * @param orgCommand
      * @return String
      */
     @RequestMapping(value="org/addOrg",method= RequestMethod.GET)
@@ -110,186 +135,55 @@ public class ManageOrgsController {
     
     
     
-    
-    
     @RequestMapping(value="org/editOrg",method= RequestMethod.GET)
     @RequiresPermissions("org:edit")
-    public String showEditOrgForm(Model model, @RequestParam Integer OrgId, @ModelAttribute OrganizationCommand command) {
+    public String showEditOrgForm(Model model) {
     	
-    	//try change
-    	
-    	Organization org = orgService.getOrganization(OrgId);
+    	OrganizationCommand command = new OrganizationCommand();
+    	//@ModelAttribute OrganizationCommand command , @RequestParam Integer OrgId
+    	/*Organization org = orgService.getOrganization(OrgId);
     	command.setId(OrgId);
     	command.setName(org.getName());
-    	command.setAddress(org.getAddress());
+    	command.setAddress(org.getAddress());*/
     	model.addAttribute("OrganizationCommand", command);
     	
-    	return "org/editOrg";
+    	return "forward:/s/org/editOrg";
     }
     
     @RequestMapping(value="org/editOrg",method= RequestMethod.POST)
     @RequiresPermissions("org:edit")
     public String editOrg(Model model, @RequestParam Integer orgId, @ModelAttribute OrganizationCommand command) {
     	
+    	Organization org = new Organization();
+    	org.setId(command.getId());
+    	org.setName(command.getName());
+    	org.setAddress(command.getAddress());
+    	org.setCreator(command.getCreator());
+    	org.setCreateTime(command.getCreateTime());
+    	org.setDeleted(command.getDeleted());
+    	org.setDeletor(command.getDeletor());
+    	orgService.updateOrganization(org);
     	
-    	
-    	return "forward:/s/org/manageOrgs";
-    }
-    
-    
-    
-    
-	/*
-    
-    public String showEditOrgForm(Model model, @RequestParam Integer OrgId, @ModelAttribute OrgCommand command) {
-
-		Role role = roleService.getRole(roleId);
-		command.setId(roleId);
-        command.setName(role.getName());
-        command.setDescription(role.getDescription());
-        command.setPermissions(role.getPermissions().toString().substring(1, role.getPermissions().toString().length()-1));
-		
-        Set<String> checkedRolePermissionSet = role.getPermissions();
-        
-        User currentUser = userService.getCurrentUser();
-    	List<Permission> plist = permissionService.getAllPermissions();
-    	
-    	//stripped simple permission string to a set to compare and mixed with current permission
-    	HashSet<String> allRolePermissionSet = new HashSet<String>();
-    	for (Permission p : plist) {
-    		allRolePermissionSet.add(p.getElement());
-		}
-    	
-    	//get all of permissions from current role that related with current user
-    	HashSet<String> currentRolePermissionSet = new HashSet<String>();
-    	for (Role r : currentUser.getRoles()) {
-    		currentRolePermissionSet.addAll(r.getPermissions());
-		}
-    	
-    	//compare and get mixed permissions
-    	allRolePermissionSet.retainAll(currentRolePermissionSet);
-    	
-    	String jsonStr = "";
-    	for (Permission permission : plist) {
-    		if( allRolePermissionSet.contains(permission.getElement()) || permission.getElement().contains(":-")){
-	    		String tmp = "{'pid':"+"'"+permission.getParentId()+"'"+"," +
-	    				"'input':"+"'"+permission.getElement()+"'"+"," +
-	    				"'text':"+"'"+permission.getName()+"'"+"," +
-	    				"'id':"+"'"+permission.getId()+"'"+"," +
-	    				"'checked':"+ checkStatus(checkedRolePermissionSet,permission.getElement()) +
-	    				"}";
-	    		jsonStr +=tmp+","; 
-    		}
-		}
-    	
-    	//remove last comma in the end of the string
-    	model.addAttribute("permissionTree", jsonStr.substring(0, jsonStr.length()-1));
-        return "org/editOrg";
-    }*/
-	
-	/*// status 1 means checked, 0 means unchecked
-	private String checkStatus(Set<String> cSet,String pStr){
-		if(cSet.contains(pStr)){
-			return "'1'";
-		}else{
-			return "'0'";
-		}
-	}
-	
-	
-	 @RequestMapping(value="org/editOrg",method= RequestMethod.POST)
-     @RequiresPermissions("org:edit")
-     public String editRole(Model model, @RequestParam Integer roleId, @ModelAttribute RoleCommand command) {
-		Role role = roleService.getRole( roleId );
-        command.updateRole( role );
-        roleService.updateRole( role );
     	Notification notification =  new Notification();
         notification.setClassType(ConfigUtil.getConfig().getString("css.class.success"));
         notification.setTitle(ConfigUtil.getConfig().getString("msg.title.update"));
         notification.setMessage(ConfigUtil.getConfig().getString("msg.message.update"));
         model.addAttribute("Notification",notification);
-        return "forward:/s/org/manageOrgs";
-     }
-	
-     @RequestMapping(value="org/viewOrg",method= RequestMethod.GET)
-     @RequiresPermissions("role:view")
-     public String showViewRoleForm(Model model, @RequestParam Integer roleId, @ModelAttribute RoleCommand command) {
-     	
-    	 Role role = roleService.getRole( roleId );
- 		 command.setId(roleId);
-         command.setName(role.getName());
-         command.setDescription(role.getDescription());
-         command.setPermissions(role.getPermissions().toString().substring(1, role.getPermissions().toString().length()-1));
- 		
-         Set<String> checkedRolePermissionSet = role.getPermissions();
-         
-         User currentUser = userService.getCurrentUser();
-     	List<Permission> plist = permissionService.getAllPermissions();
-     	
-     	//stripped simple permission string to a set to compare and mixed with current permission
-     	HashSet<String> allRolePermissionSet = new HashSet<String>();
-     	for (Permission p : plist) {
-     		allRolePermissionSet.add(p.getElement());
- 		}
-     	
-     	//get all of permissions from current role that related with current user
-     	HashSet<String> currentRolePermissionSet = new HashSet<String>();
-     	for (Role r : currentUser.getRoles()) {
-     		currentRolePermissionSet.addAll(r.getPermissions());
- 		}
-     	
-     	//compare and get mixed permissions
-     	allRolePermissionSet.retainAll(currentRolePermissionSet);
-     	
-     	String jsonStr = "";
-     	for (Permission permission : plist) {
-     		if( allRolePermissionSet.contains(permission.getElement()) || permission.getElement().contains(":-")){
- 	    		String tmp = "{'pid':"+"'"+permission.getParentId()+"'"+"," +
- 	    				"'input':"+"'"+permission.getElement()+"'"+"," +
- 	    				"'text':"+"'"+permission.getName()+"'"+"," +
- 	    				"'id':"+"'"+permission.getId()+"'"+"," +
- 	    				"'checked':"+ checkStatus(checkedRolePermissionSet,permission.getElement()) +
- 	    				"}";
- 	    		jsonStr +=tmp+","; 
-     		}
- 		}
-     	
-     	//remove last comma in the end of the string
-     	model.addAttribute("permissionTree", jsonStr.substring(0, jsonStr.length()-1));
-     	return "org/viewOrg";
-     }	*/ 
-	 
-    /**
-     * delete some role
-     * @param model
-     * @param roleId
-     * @return
-     */
-    @RequestMapping("org/deleteOrg")
-    @RequiresPermissions("org:delete")
-    public String deleteOrg(Model model,@RequestParam Integer... orgId) {
-    	int count = 0;
-    	for (Integer longId : orgId) {
-    		//this org can`t delete if any user related with it 
-    		if( userService.getUserByBelongOrg(longId).isEmpty() ){
-    			count++;
-    			orgService.deleteOrganization(longId);
-    		}
-		}
-    	Notification notification =  new Notification();
-    	if( count>0 ){
-    		notification.setClassType(ConfigUtil.getConfig().getString("css.class.success"));
-            notification.setTitle(ConfigUtil.getConfig().getString("msg.title.delete"));
-            notification.setMessage(ConfigUtil.getConfig().getString("msg.message.delete"));
-    	}else{
-    		notification.setClassType(ConfigUtil.getConfig().getString("css.class.tip"));
-            notification.setTitle(ConfigUtil.getConfig().getString("msg.title.org.delete.tip"));
-            notification.setMessage(ConfigUtil.getConfig().getString("msg.message.org.delete.tip"));
-    	}
-        model.addAttribute("Notification",notification);
-        return "forward:/s/org/manageOrgs";
+    	
+    	return "org/manageOrgs";
     }
     
+    @RequestMapping(value="org/viewOrg",method= RequestMethod.GET)
+    @RequiresPermissions("org:view")
+    public String showViewOrgForm(Model model, @RequestParam Integer orgId, @ModelAttribute OrganizationCommand command) {
+    	
+    	
+    	return "org/viewOrg";
+    }
+    
+    
+	
+	/*
     @RequestMapping(value="org/searchOrgs",method= RequestMethod.POST)
     @RequiresPermissions("org:view")
     public String searchRoleForm(Model model,HttpServletRequest request, @ModelAttribute OrganizationCommand command) {
@@ -302,6 +196,6 @@ public class ManageOrgsController {
     	model.addAttribute("Page", orgService.searchPageOrganizations(
     			currentPage, pageSize, command));
     	return "org/manageOrgs";
-    }
+    }*/
 }
 

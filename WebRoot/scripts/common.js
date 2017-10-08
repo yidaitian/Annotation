@@ -106,6 +106,8 @@ rapidsh.toggleVisibility = function(targetId) {
  * type-鎿嶄綔绫诲瀷锛屽垹闄�del)銆佹煡鐪�view)銆佷慨鏀�edit)
  * */
 rapidsh.actionPerformance = function(formId, url, type) {
+	alert("iehfwfev8egveoebc8932f 2302h0");
+	
 	if( type =="del" || type =="send"){
 		 if( $("input:checked").length >= 1 ){
 			 $('#'+formId+'').attr("action", url);

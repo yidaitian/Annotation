@@ -43,7 +43,7 @@
 				条记录
 				<a href="<c:url value="/s/org/manageOrgs"/>" class="white reloadButton">刷新</a>
 			</div>
-<div class="clear"></div>
+			<div class="clear"></div>
 			<div id="pageBarSearchDivId" style="display:none;">
 			<form action="<c:url value="/s/org/searchOrgs"/>" method="post">
 				<div class="fl">
@@ -74,4 +74,35 @@
 <!-- CONTENT  END--> 
 </div>
 </body>
+
+<script type=text/javascript>
+rapidsh.actionPerformance = function(formId, url, type) {
+	
+	if( type =="del" || type =="send"){
+		 if( $("input:checked").length >= 1 ){
+			 $('#'+formId+'').attr("action", url);
+			 $('#'+formId+'').attr("method", "post");
+			 $('#'+formId+'').submit();
+		 }else{
+			 alert("请至少勾选一条记录!!");
+			 return;
+		 }
+	 }
+	 if( type =="edit" || type =="view"){	
+		 if( $("input:checked").length==1 ){
+			 $('#'+formId+'').attr("action", url);
+			 $('#'+formId+'').attr("method", "get");
+			 $('#'+formId+'').submit();
+		 }else{
+			 //alert("请勾选一条记录!!");
+			 if($("input:checked").length < 1)
+				 alert("请勾选一条记录!!");
+			 else
+				 alert("[修改]/[查看]最多只能选中一条记录!!!");
+			 return;
+		 }
+	 }
+};
+</script>
+
 </html>

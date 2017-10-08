@@ -17,12 +17,6 @@
 <div class="title">编辑角色</div>
 <div class="content">
 <div id="box">
-<c:if test="${Notification!=null}">
-<div class="notif ${Notification.classType}">
-   <strong>${Notification.title} :</strong> ${Notification.message}. 
-   <a href="#" class="close"></a>
-</div>
-</c:if>
  <form:form modelAttribute="roleCommand">
      <div class="content" id="contentId">
        <div class="input">

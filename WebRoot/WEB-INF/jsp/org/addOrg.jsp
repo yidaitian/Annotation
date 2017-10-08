@@ -81,6 +81,7 @@ select {
 	});
 </script>
 </head>
+
 <body>
 <div id="content" class="white">
 <h1><img src="<c:url value="/styles/img/icons/users.png"/>" /> 机构管理</h1>

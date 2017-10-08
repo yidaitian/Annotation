@@ -17,12 +17,6 @@
 <div class="title">新增角色</div>
 <div class="content">
 <div id="box">
-<c:if test="${Notification!=null}">
-<div class="notif ${Notification.classType}">
-   <strong>${Notification.title} :</strong> ${Notification.message}. 
-   <a href="#" class="close"></a>
-</div>
-</c:if>
 <form action="<c:url value="/s/role/addRole"/>" method="post">
      <div class="content" id="contentId">
        <div class="input">

@@ -53,10 +53,19 @@ private static final Logger log = LoggerFactory.getLogger(ManageStudyController.
     
     @Autowired
     private BStudyService studyService;
+    
+    @Autowired
+    private BAssignmentService assignmentService;
+    
+    @Autowired
+    private BImageService imageService;
+    
+    @Autowired
+    private BSeriseService seriseService;
 
     @RequestMapping("study/manageStudy")
     @RequiresPermissions("study:-")
-    public void manageUsers(Model model, HttpServletRequest request) {
+    public void manageStudy(Model model, HttpServletRequest request) {
     	//get the currentPage number from request
         int currentPage = Page.getCurrentPage(request);
         //get the pageSize number from cookies

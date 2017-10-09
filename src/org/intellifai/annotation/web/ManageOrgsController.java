@@ -75,7 +75,7 @@ public class ManageOrgsController {
         //put Page object to request scope
     	model.addAttribute("Page", orgService.getPageOrganizations(currentPage, pageSize));
     	log.debug("opened manage organization list page...");
-    }
+    } // end of manageOrgs
     
     @RequestMapping("org/deleteOrg")
     @RequiresPermissions("org:delete")
@@ -100,7 +100,7 @@ public class ManageOrgsController {
     	}
         model.addAttribute("Notification",notification);
         return "forward:/s/org/manageOrgs";
-    }
+    } // end of deleteOrg
     
     /**
      * add new Org
@@ -116,7 +116,7 @@ public class ManageOrgsController {
     	model.addAttribute("OrganizationCommand", orgCommand);
     	
     	return "org/addOrg";
-    }
+    } // end of showAddOrgForm
     
     @RequestMapping(value="org/addOrg",method= RequestMethod.POST)
     @RequiresPermissions("org:add")
@@ -131,7 +131,7 @@ public class ManageOrgsController {
 		}
     	
     	return "forward:/s/org/manageOrgs";
-    }
+    } // end of addOrg
     
     
     

@@ -36,9 +36,9 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @version V2.0
  */
 @Controller
-public class ManageStudyController {
+public class ManageAssignController {
 
-private static final Logger log = LoggerFactory.getLogger(ManageStudyController.class);
+private static final Logger log = LoggerFactory.getLogger(ManageAssignController.class);
 	
     private EditUserValidator editUserValidator = new EditUserValidator();
 
@@ -63,8 +63,8 @@ private static final Logger log = LoggerFactory.getLogger(ManageStudyController.
     @Autowired
     private BSeriseService seriseService;
 
-    @RequestMapping("study/manageStudy")
-    @RequiresPermissions("study:-")
+    @RequestMapping("study/manageAssign")
+    @RequiresPermissions("assign:-")
     public void manageStudy(Model model, HttpServletRequest request) {
     	//get the currentPage number from request
         int currentPage = Page.getCurrentPage(request);
@@ -72,7 +72,7 @@ private static final Logger log = LoggerFactory.getLogger(ManageStudyController.
         int pageSize = CookieUtils.getPageSize(request);
         //put Page object to request scope
     	model.addAttribute("Page", studyService.getPageBStudys(currentPage, pageSize));
-    	log.info("Go to manageStudy.....");
+    	log.info("Go to manageAssign.....");
     }
 }
 

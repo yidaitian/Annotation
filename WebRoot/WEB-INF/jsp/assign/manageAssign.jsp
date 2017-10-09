@@ -86,7 +86,7 @@ select {
 <h1><img src="<c:url value="/styles/img/icons/users.png"/>" /> 用户管理</h1>
 <c:if test="${Notification!=null}">
 <div class="notif ${Notification.classType}">
-   <strong>${Notification.title} :</strong> ${Notification.message}. 
+   <strong>${Notification.title} :</strong> ${Notification.message}.
    <a href="#" class="close"></a>
 </div>
 </c:if>
@@ -97,8 +97,8 @@ select {
 			<div class="fl">
 			<img src="<c:url value="/styles/images/fold.png"/>" title="打开搜索栏" id="openAdvanceSearchImgId" border="0" style="cursor: pointer;" /> 
 			</div>
-			<div class="fr" id="actionBtnId">
-			<%-- <shiro:hasPermission name="role:add">
+			<%-- <div class="fr" id="actionBtnId">
+			<shiro:hasPermission name="role:add">
             <a href="<c:url value="/s/role/showAddRoleForm"/>" class="white addButton">增加</a>
             </shiro:hasPermission>
 			<shiro:hasPermission name="role:delete">
@@ -109,20 +109,20 @@ select {
             </shiro:hasPermission>
 			<shiro:hasPermission name="role:view">
             <a href="#" class="white viewButton" onclick="rapidsh.actionPerformance('roleListFormId','<c:url value="/s/role/viewRole"/>','view');">查看</a>
-            </shiro:hasPermission> --%>
+            </shiro:hasPermission>
 				每页显示
 				<input type="text" title="最多每页可显示200条" id="pageSizeId" size="3" maxlength="3" onchange="rapidsh.setCookies('rapidsh_cookie_page_size',this.value,100)"/>
 				条记录
 				<a href="<c:url value="/s/study/manageStudy"/>" class="white reloadButton">刷新</a>
-			</div>
+			</div> --%>
 <div class="clear"></div>
 			<div id="pageBarSearchDivId" style="display:none;">
-			<form action="<c:url value="/s/study/searchStudy"/>" method="post">
+			<form action="<c:url value="/s/assign/searchStudy"/>" method="post">
 				<div class="fl">
 				UID：<input type="text" name="StudyInstanceUID"/>
 				</div>
 				<div class="fl">
-				性别：<input type="text" name="????????"/>
+				性别：<input type="text" name="patientSex"/>
 				</div>
 				<div class="fr submit">
 				<input type="submit" value="搜索" class="button"/>
@@ -130,7 +130,7 @@ select {
 			</form>
 			</div>
 		</div>
-<div class="clear"></div>
+<%-- <div class="clear"></div>
 		<form name="studyListFormId" action="" id="studyListFormId">
 		  <display:table name="Page.resultList" htmlId="userManageListId" requestURI="/s/study/manageStudy" id="Study" pagesize="${Page.pageSize}" partialList="true" size="Page.resultTotalSize" export="false">
 		    <display:column style="width: 5%" title="${checkAll}">
@@ -148,7 +148,7 @@ select {
 		  </display:table>
 		</form>
 	</div>        
-</div> 
+</div>  --%>
 <!-- CONTENT  END--> 
 </div>
 </body>

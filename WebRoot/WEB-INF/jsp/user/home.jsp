@@ -63,14 +63,14 @@ String ctx =  request.getContextPath();
         </li>
         <li class=""><a href="#"><img src="<c:url value="/styles/img/icons/menu/layout.png"/>"/>任务管理</a>
             <ul>
-                <li><a href="<c:url value="/s/study/manageStudys"/>" target="contentFrame">可分配工作</a></li>
-                <li><a href="<c:url value="/s/assignment/manageAssignments"/>" target="contentFrame">已分配任务</a></li>
+                <li><a href="<c:url value="/s/assignment/manageAssign"/>" target="contentFrame">分配工作</a></li>
+                <li><a href="<c:url value="/s/assignment/manageCancel"/>" target="contentFrame">撤销任务</a></li>
                 
             </ul>
         </li>
         <li class=""><a href="#"><img src="<c:url value="/styles/img/icons/menu/layout.png"/>"/>标注</a>
             <ul>
-                <li><a href="<c:url value="/s/annotation/annotation"/>" target="contentFrame">标注页面</a></li>
+                <li><a href="<c:url value="/s/annotation/annotation"/>" target="contentFrame">前去标注</a></li>
                 
             </ul>
         </li>

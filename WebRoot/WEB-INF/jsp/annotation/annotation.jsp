@@ -12,8 +12,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <meta charset="UTF-8">
     <script data-require="jquery@*" data-semver="2.0.3" src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
   
-    <link rel="stylesheet" type="text/css" href="<c:url value="/static/annotation/annotation.css"/>"/>  
-    <script type="text/javascript" src="<c:url value="/static/annotation/annotation.js"/>"></script>  
+    <%-- <link rel="stylesheet" type="text/css" href="<c:url value="/static/annotation/annotation.css"/>"/>   --%>
+    <script type="text/javascript" src="<c:url value="/static/annotation/annotation.js"/>"></script> 
+    <script type="text/javascript" src="jquery"></script> 
     
     <title>Annotation</title>
     
@@ -26,7 +27,411 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
       ga('create', 'UA-20555581-2', 'auto');
       ga('set', 'page', '/via-1.0.0.html');
       ga('send', 'pageview');
+      
     </script>
+    <!-- CSS style definition -->
+    <style type="text/css">
+      body {
+      min-width: 800px;
+      padding: 0;
+      margin: 0;
+      font-family: sans-serif;
+      }
+      /* Top panel : #navbar, #toolbar */
+      .top_panel {
+      position: relative;
+      top: 0;
+      left: 0;
+      display: block;
+      font-size: medium;
+      background-color: #000000;
+      color: white;
+      z-index: 10;
+      margin: 0;
+      padding: 0;
+      }
+      .navbar {
+      display: inline-block;
+      }
+      .navbar ul {
+      display: inline;
+      list-style-type: none;
+      overflow: hidden;
+      }
+      .navbar li {
+      float: left;
+      }
+      .navbar li a, .drop_menu_item {
+      display: inline-block;
+      color: white;
+      padding: 0.65em 1.2em;
+      text-decoration: none;
+      }
+      .navbar li a:hover, .dropdown:hover {
+      background-color: #999999;
+      cursor: pointer;
+      }
+      .navbar li.dropdown {
+      display: inline-block;
+      }
+      .navbar .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #333333;
+      min-width: 120px;
+      border: 1px solid #ffffff;
+      font-size: small;
+      }
+      .navbar .dropdown-content a {
+      color: #ffffff;
+      padding: 0.4em 0.6em;
+      text-decoration: none;
+      display: block;
+      text-align: left;
+      background-color: #333333;
+      float: none;
+      }
+      .navbar .dropdown-content a:hover {
+      background-color: #000000;
+      color: #ffff00;
+      }
+      .navbar .dropdown:hover .dropdown-content {
+      display: block;
+      }
+      .toolbar {
+      display: inline-block;
+      color: white;
+      vertical-align: top;
+      }
+      .toolbar ul {
+      display: inline;
+      list-style-type: none;
+      overflow: hidden;
+      }
+      .toolbar li {
+      font-size: medium;
+      float: left;
+      padding: 0.65em 0.3em;
+      color: white;
+      }
+      .toolbar li:hover {
+      background-color: #333333;
+      color: red;
+      cursor: pointer;
+      }
+      #fileinfo {
+      font-size: small;
+      padding: 1.2em 0.8em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      }
+      /* Middle panel: containing #image_panel, #leftsidebar */
+      .middle_panel {
+      display: table;
+      table-layout: fixed;
+      width: 90%;
+      z-index: 1;
+      padding: 0;
+      padding-top: 1.0125em; /* ensures the mouse event (x,y) coordinates are integer */
+      }
+      #leftsidebar {
+      display: table-cell;
+      width: 230px;
+      z-index: 10;
+      vertical-align: top;
+      }
+      #display_area {
+      display: table-cell;
+      width: 65%;
+      z-index: 1;
+      margin: 0;
+      padding-left: 1em;
+      vertical-align: top;
+      }
+      #canvas_panel {
+      position: relative;
+      margin: 0;
+      padding: 0;
+      }
+      #leftsidebar_collapse_panel {
+      display: table-cell;
+      position: relative;
+      width: 10px;
+      z-index: 1;
+      vertical-align: top;
+      font-size: small;
+      }
+      #leftsidebar_collapse_button {
+      background-color: black;
+      width: 16px;
+      height: 36px;
+      color: white;
+      padding: 0.2em;
+      border-radius: 0px 5px 5px 0px;
+      font-size: large;
+      }
+      #leftsidebar_collapse_button:hover {
+      color: red;
+      cursor: pointer;
+      }
+      /* Left sidebar accordion */
+      button.leftsidebar_accordion {
+      font-size: large;
+      background-color: #f2f2f2;
+      cursor: pointer;
+      padding: 0.5em 0.5em;
+      width: 100%;
+      text-align: left;
+      border: 0;
+      outline: none;
+      }
+      button.leftsidebar_accordion:focus {
+      outline: none;
+      }
+      button.leftsidebar_accordion.active, button.leftsidebar_accordion:hover {
+      background-color: #e6e6e6;
+      }
+      button.leftsidebar_accordion:after {
+      content: '\02795';
+      color: #4d4d4d;
+      float: right;
+      }
+      button.leftsidebar_accordion.active:after {
+      content: '\2796';
+      }
+      .leftsidebar_accordion_panel {
+      display: none;
+      padding-top: 0;
+      padding-left: 0.5em;
+      font-size: small;
+      border-right: 2px solid #f2f2f2;
+      border-bottom: 2px solid #f2f2f2;
+      }
+      .leftsidebar_accordion_panel.show {
+      display: block;
+      }
+      /* Region shape selection panel inside leftsidebar */
+      ul.region_shape {
+      font-size: xx-large;
+      list-style-type: none;
+      overflow: hidden;
+      padding: 0.4em 0;
+      margin: 0;
+      }
+      ul.region_shape li{
+      float: left;
+      padding: 0 0.16em;
+      fill: #ffffff;
+      stroke: #000000;
+      }
+      ul.region_shape li:hover {
+      cursor: pointer;
+      fill: #ffffff;
+      stroke: #ff0000;
+      }
+      ul.region_shape .selected {
+      fill: #ffffff;
+      stroke: #ff0000;
+      }
+      /* Loaded image list shown in leftsidebar panel */
+      #img_list_panel {
+      display: none;
+      height: 0;
+      font-size: small;
+      overflow: scroll;
+      }
+      #img_list_panel ul {
+      position: relative;
+      line-height: 1.3em;
+      padding-left: 0;
+      list-style-type: none;
+      }
+      #img_list_panel li {
+      white-space: nowrap;
+      }
+      #img_list_panel li:hover {
+      background-color: #cccccc;
+      color: #000000;
+      cursor: pointer;
+      }
+      #message_panel {
+      position: fixed;
+      left: 0;
+      bottom: 0px;
+      line-height: 3em;
+      width: 100%;
+      background-color: #000000;
+      color: #ffff00;
+      font-size: small;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      z-index: 1000;
+      }
+      #invisible_file_input {
+      width: 0.1px;
+      height: 0.1px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      z-index: -1;
+      }
+      .text_panel {
+      display: none;
+      margin: auto;
+      font-size: medium;
+      line-height: 1.3em;
+      margin: 0;
+      max-width: 700px;
+      }
+      .text_panel li {
+      margin: 1em 0;
+      text-align: left;
+      }
+      .text_panel p {
+      text-align: left;
+      }
+      .action_text_link {
+      background-color: #aaeeff;
+      color: #000000;
+      }
+      .action_text_link:hover {
+      cursor: pointer;
+      }
+      .svg_button:hover {
+      cursor: pointer;
+      }
+      .tool_button {
+      color: blue;
+      cursor: pointer;
+      }
+      .tool_button:hover {
+      color: red;
+      }
+      /* region and file attributes input panel (spreadsheet like) */
+      #attributes_panel {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      z-index: 10;
+      width: 100%;
+      max-height: 30%;
+      overflow: auto;
+      background-color: #ffffff;
+      border-top: 4px solid #000000;
+      padding: 0em 0em;
+      padding-bottom: 2em;
+      font-size: small;
+      }
+      #attributes_panel table {
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin: 1em;
+      margin-bottom: 2em;
+      }
+      #attributes_panel td {
+      border: 1px solid #999999;
+      padding: 1em 1em;
+      margin: 0;
+      height: 1em;
+      white-space: nowrap;
+      vertical-align: top;
+      }
+      #attributes_panel tr:first-child td, #attributes_panel td:first-child {
+      padding: 1em 1em;
+      text-align: center;
+      }
+      #attributes_panel input {
+      border: none;
+      padding: 0;
+      margin: 0;
+      display: table-cell;
+      height: 1.3em;
+      font-size: small;
+      background-color: #ffffff;
+      vertical-align: top;
+      }
+      #attributes_panel input:hover {
+      background-color: #e6e6e6;
+      }
+      #attributes_panel input:focus {
+      background-color: #e6e6e6;
+      }
+      #attributes_panel input:not(:focus) {
+      text-align: center;
+      }
+      #attributes_panel textarea {
+      border: none;
+      padding: 0;
+      margin: 0;
+      display: table-cell;
+      font-size: small;
+      background-color: #ffffff;
+      }
+      #attributes_panel textarea:hover {
+      background-color: #e6e6e6;
+      }
+      #attributes_panel textarea:focus {
+      background-color: #e6e6e6;
+      }
+      #attributes_panel_toolbar {
+      display: block;
+      height: 30px;
+      width: 100%;
+      position: relative;
+      padding: 0;
+      margin: 0;
+      }
+      .attributes_panel_button {
+      width: 10px;
+      color: black;
+      font-size: x-large;
+      margin-left: 0.5em;
+      padding: 0;
+      }
+      .attributes_panel_button:hover {
+      color: red;
+      cursor: pointer;
+      }
+      /* layers of canvas */
+      #image_panel {
+      position: relative;
+      display: inline-block;
+      margin: auto;
+      margin-top: 1em;
+      }
+      #image_canvas {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      z-index: 1;
+      }
+      #region_canvas {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      z-index: 2;
+      }
+      /* Loading spinbar */
+      .loading_spinbox {
+      display: inline-block;
+      border: 0.4em solid #cccccc;
+      border-radius: 50%;
+      border-top: 0.4em solid #000000;
+      -webkit-animation: spin 2s linear infinite;
+      animation: spin 2s linear infinite;
+      }
+      @-webkit-keyframes spin {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+      }
+      @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+      }
+    </style>
 
   </head>
   
@@ -66,12 +471,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
           
           
           
-          <form:form modelAttribute="BStudyCommand">
+          <%-- <form:form modelAttribute="BStudyCommand"> --%>
             <div class="dropdown-content">
               <a onclick="sel_local_images()" title="Load (or add) a set of images from local disk">加载或添加图片</a>
               <a onclick="show_img_list()" title="Browse currently loaded images">显示图片列表</a>
             </div>
-          </form:form>
+          <%-- </form:form> --%>
           
           
           
@@ -386,6 +791,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
   and [Contributing Guidelines](https://gitlab.com/vgg/via/blob/develop/CONTRIBUTING.md)
   for more details.
 */
+
+var image_list = ${studyImageList}   //added by sxz
+
 var VIA_VERSION      = '1.0.1';
 var VIA_NAME         = '标注软件';
 
@@ -523,7 +931,7 @@ var region_attribute_type = new Array("L", "S", "shape", "margin", "burr", "morp
 //
 // Data structure for annotations
 //
-function ImageMetadata(fileref, filename, size) {
+/* function ImageMetadata(fileref, filename, size) {
   this.filename = filename;
   this.size     = size;
   this.fileref  = fileref;          // image url or local file ref.
@@ -532,6 +940,17 @@ function ImageMetadata(fileref, filename, size) {
   this.img_labels = new Map();
   this.file_attributes = new Map(); // image attributes
   this.base64_img_data = '';        // image data stored as base 64
+} */
+function ImageMetadata(fileref, filename, size, url) {    //changed by sxz
+	  this.filename = filename;
+	  this.size     = size;
+	  this.url      = url;         //added by sxz
+	  this.fileref  = fileref;          // image url or local file ref.
+	  //this.filepath = filepath
+	  this.regions  = [];
+	  this.img_labels = new Map();
+	  this.file_attributes = new Map(); // image attributes
+	  this.base64_img_data = '';        // image data stored as base 64
 }
 function ImageRegion() {
   this.is_user_selected  = false;
@@ -545,6 +964,9 @@ function _via_init() {
   console.log(VIA_NAME);
   show_message(VIA_NAME + ' (' + VIA_SHORT_NAME + ') version ' + VIA_VERSION +
                '. Ready !', 2*VIA_THEME_MESSAGE_TIMEOUT_MS);
+  
+  store_local_img_ref();  //added by sxz 
+  
   show_home_panel();
   _via_is_local_storage_available = check_local_storage();
   if (_via_is_local_storage_available) {
@@ -658,7 +1080,8 @@ function clear_image_display_area() {
 // Local file uploaders
 //
 function store_local_img_ref(event) {
-  var user_selected_images = event.target.files;
+  //var user_selected_images = event.target.files;
+  var user_selected_images = image_list;
   var original_image_count = _via_img_count;
   // clear browser cache if user chooses to load new images
   if (original_image_count === 0) {
@@ -666,10 +1089,11 @@ function store_local_img_ref(event) {
   }
   var discarded_file_count = 0;
   for ( var i = 0; i < user_selected_images.length; ++i ) {
-    var filetype = user_selected_images[i].type.substr(0, 5);
-    if ( filetype === 'image' ) {
+   // var filetype = user_selected_images[i].type.substr(0, 5);   //deleted by sxz
+   // if ( filetype === 'image' ) {
       var filename = user_selected_images[i].name;
       var size     = user_selected_images[i].size;
+      var url  = user_selected_images[i].url;    //added by sxz
       var img_id   = _via_get_image_id(filename, size);
       if ( _via_img_metadata.hasOwnProperty(img_id) ) {
         if ( _via_img_metadata[img_id].fileref ) {
@@ -681,14 +1105,15 @@ function store_local_img_ref(event) {
       } else {
         _via_img_metadata[img_id] = new ImageMetadata(user_selected_images[i],
                                                       filename,
-                                                      size);
+                                                      size,
+                                                      url);    //changed by sxz
         _via_image_id_list.push(img_id);
         _via_img_count += 1;
         _via_reload_img_table = true;
       }
-    } else {
-      discarded_file_count += 1;
-    }
+   // } else {
+   //   discarded_file_count += 1;
+   // }
   }
   if ( _via_img_metadata ) {
     var status_msg = 'Loaded ' + (_via_img_count - original_image_count) + ' images.';
@@ -1056,7 +1481,7 @@ function pack_via_metadata(return_type) {
     var csvdata = [];
     var csvheader = '#filename,file_size,file_attributes,region_count,region_id,region_shape_attributes,region_attributes'; //肺癌的
     
-    show_message(_via_img_metadata);
+    //show_message(_via_img_metadata);
     csvdata.push(csvheader);
     for ( var image_id in _via_img_metadata ) {
       var fattr = map_to_json( _via_img_metadata[image_id].file_attributes );
@@ -1095,7 +1520,7 @@ function pack_via_metadata(return_type) {
       image_data.fileref = '';
       image_data.size = _via_img_metadata[image_id].size;
       image_data.filename = _via_img_metadata[image_id].filename;
-      image_data.base64_img_data = '';
+      image_data.base64_img_data = _via_img_metadata[image_id].url;     //changed by sxz
       //image_data.base64_img_data = _via_img_metadata[image_id].base64_img_data;
       // copy file attributes
       image_data.file_attributes = {};
@@ -1215,6 +1640,20 @@ function show_image(image_index) {
       _via_user_sel_region_id = -1;
       _via_current_image_width = _via_current_image.naturalWidth;
       _via_current_image_height = _via_current_image.naturalHeight;
+	  
+	  //add by cql
+	  
+	  	  //console.log("naturalWidth:"+VIA_REGION_SMALL_CIRCLE_RADIUS*_via_current_image.naturalWidth/1600);
+	  if(_via_current_image.naturalWidth<1000){
+		VIA_REGION_SMALL_CIRCLE_RADIUS  = 60*_via_current_image.naturalWidth/1600+15;
+		VIA_REGION_BIG_CIRCLE_RADIUS = 80 *_via_current_image.naturalWidth/1600+20;
+	  }else{
+	  	VIA_REGION_SMALL_CIRCLE_RADIUS  = 60*_via_current_image.naturalWidth/1600;
+		VIA_REGION_BIG_CIRCLE_RADIUS = 80 *_via_current_image.naturalWidth/1600;
+	  }
+	  
+	  //add by cql end
+	  
       // set the size of canvas
       // based on the current dimension of browser window
       var de = document.documentElement;
@@ -1249,8 +1688,10 @@ function show_image(image_index) {
       _via_img_ctx.drawImage(_via_current_image, 0, 0,
                              _via_canvas_width, _via_canvas_height);
       // refresh the attributes panel
-      update_attributes_panel();
+      //fix bug by cql
       _via_load_canvas_regions(); // image to canvas space transform
+      update_attributes_panel();
+      //fix bug by cql
       _via_redraw_reg_canvas();
       _via_reg_canvas.focus();
       img_loading_spinbar(false);
@@ -1266,6 +1707,10 @@ function show_image(image_index) {
     });
     _via_current_image.src = img_reader.result;
   }, false);
+  
+  _via_img_metadata[img_id].base64_img_data = _via_img_metadata[img_id].url;   //added by sxz
+  
+  
   if (_via_img_metadata[img_id].base64_img_data === '') {
     // load image from file
     img_reader.readAsDataURL( _via_img_metadata[img_id].fileref );
@@ -1458,7 +1903,6 @@ function reload_img_table() {
       fni += '[' + (i+1) + '] ' + _via_loaded_img_fn_list[i];
     }
     if ( _via_loaded_img_region_attr_miss_count[i] ) {
-      // alert(_via_loaded_img_region_attr_miss_count[i])
       fni += ' (' + '<span style="color: red;">';
       fni += _via_loaded_img_region_attr_miss_count[i] + '</span>' + ')';
     }
@@ -1625,7 +2069,10 @@ _via_reg_canvas.addEventListener('mousedown', function(e) {
 // implements the following functionalities:
 //  - new region drawing (including polygon)
 //  - moving/resizing/select/unselect existing region
-_via_reg_canvas.addEventListener('mouseup', function(e) {  
+_via_reg_canvas.addEventListener('mouseup', function(e) {
+    if( !_via_is_reg_attr_panel_visible ) {
+      toggle_reg_attr_panel();
+    }
   _via_click_x1 = e.offsetX; _via_click_y1 = e.offsetY;
   var click_dx = Math.abs(_via_click_x1 - _via_click_x0);
   var click_dy = Math.abs(_via_click_y1 - _via_click_y0);
@@ -1858,7 +2305,7 @@ _via_reg_canvas.addEventListener('mouseup', function(e) {
     } else {
       var region_id = is_inside_region(_via_click_x0, _via_click_y0);
       if ( region_id >= 0 ) {
-        // first click selects region_via_reg_canvas.addEventListener('mousedown', function(e) {
+        // first click selects region
         _via_user_sel_region_id     = region_id;
         _via_is_region_selected     = true;
         _via_is_user_moving_region  = false;
@@ -1879,7 +2326,6 @@ _via_reg_canvas.addEventListener('mouseup', function(e) {
           toggle_all_regions_selection(false);
           update_attributes_panel();
         } else {
-          // alert('aa')
           switch (_via_current_shape) {
           case VIA_REGION_SHAPE.POLYGON:
             // user has clicked on the first point in a new polygon
@@ -2544,7 +2990,7 @@ function _via_draw_polygon_region(all_points_x, all_points_y, is_selected) {
 }
 function _via_draw_point_region(cx, cy, is_selected) {
   if (is_selected) {
-    _via_draw_point(cx, cy, VIA_REGION_POINT_RADIUS);
+    _via_draw_point(cx, cy, r);
     _via_reg_ctx.strokeStyle = VIA_THEME_SEL_REGION_FILL_BOUNDARY_COLOR;
     _via_reg_ctx.lineWidth   = VIA_THEME_REGION_BOUNDARY_WIDTH/2;
     _via_reg_ctx.stroke();
@@ -2556,16 +3002,16 @@ function _via_draw_point_region(cx, cy, is_selected) {
     // draw a fill line
     _via_reg_ctx.strokeStyle = VIA_THEME_BOUNDARY_FILL_COLOR;
     _via_reg_ctx.lineWidth   = VIA_THEME_REGION_BOUNDARY_WIDTH/2;
-    _via_draw_point(cx, cy, VIA_REGION_POINT_RADIUS);
+    _via_draw_point(cx, cy, r);
     _via_reg_ctx.stroke();
     // draw a boundary line on both sides of the fill line
     _via_reg_ctx.strokeStyle = VIA_THEME_BOUNDARY_LINE_COLOR;
     _via_reg_ctx.lineWidth   = VIA_THEME_REGION_BOUNDARY_WIDTH/4;
     _via_draw_point(cx, cy,
-                    VIA_REGION_POINT_RADIUS - VIA_THEME_REGION_BOUNDARY_WIDTH/2);
+                    Math.abs(r - VIA_THEME_REGION_BOUNDARY_WIDTH/2));
     _via_reg_ctx.stroke();
     _via_draw_point(cx, cy,
-                    VIA_REGION_POINT_RADIUS + VIA_THEME_REGION_BOUNDARY_WIDTH/2);
+                    Math.abs(r + VIA_THEME_REGION_BOUNDARY_WIDTH/2));
     _via_reg_ctx.stroke();
   }
 }
@@ -2575,7 +3021,6 @@ function _via_draw_point(cx, cy, r) {
   _via_reg_ctx.closePath();
 }
 function draw_all_region_id() {
-  // alert("ss")
   _via_reg_ctx.shadowColor = "transparent";
   for ( var i = 0; i < _via_img_metadata[_via_image_id].regions.length; ++i ) {
     var canvas_reg = _via_canvas_regions[i];

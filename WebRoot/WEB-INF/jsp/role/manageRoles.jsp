@@ -11,7 +11,7 @@
 <body>
 <!-- CONTENT  BEGIN--> 
 <div id="content" class="white">
-<h1><img src="<c:url value="/styles/img/icons/users.png"/>" /> 角色管理</h1>
+<h1 style="color:white"><img src="<c:url value="/styles/img/icons/users.png"/>" /> 角色管理</h1>
 <c:if test="${Notification!=null}">
 <div class="notif ${Notification.classType}" >
    <strong>${Notification.title} :</strong> ${Notification.message}. 

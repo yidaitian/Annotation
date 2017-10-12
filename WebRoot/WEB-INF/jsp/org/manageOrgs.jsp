@@ -75,7 +75,7 @@
 </div>
 </body>
 
-<script type=text/javascript>
+<!-- <script type=text/javascript>
 rapidsh.actionPerformance = function(formId, url, type) {
 	
 	if( type =="del" || type =="send"){
@@ -103,6 +103,6 @@ rapidsh.actionPerformance = function(formId, url, type) {
 		 }
 	 }
 };
-</script>
+</script> -->
 
 </html>

@@ -43,7 +43,7 @@ select {
 
 <body>
 <div id="content" class="white">
-<h1><img src="<c:url value="/styles/img/icons/users.png"/>" /> 机构管理</h1>
+<h1><img src="<c:url value="/styles/img/icons/users.png"/>" />机构管理</h1>
 <div class="bloc">
     <div class="title">编辑机构</div>
     	<div class="content">

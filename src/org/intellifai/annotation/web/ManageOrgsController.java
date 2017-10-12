@@ -60,11 +60,7 @@ public class ManageOrgsController {
 	@Autowired
 	private PermissionService permissionService;
 	
-    /**
-     * show Org list
-     * @param model
-     * @param request
-     */
+	
     @RequestMapping("org/manageOrgs")  
     @RequiresPermissions("org:-")
     public void manageOrgs(Model model, HttpServletRequest request) {
@@ -102,12 +98,6 @@ public class ManageOrgsController {
         return "forward:/s/org/manageOrgs";
     } // end of deleteOrg
     
-    /**
-     * add new Org
-     * @param model
-     * @param orgCommand
-     * @return String
-     */
     @RequestMapping(value="org/addOrg",method= RequestMethod.GET)
     @RequiresPermissions("org:add")
     public String showAddOrgForm(Model model){
@@ -134,7 +124,6 @@ public class ManageOrgsController {
     } // end of addOrg
     
     
-    
     @RequestMapping(value="org/editOrg",method= RequestMethod.GET)
     @RequiresPermissions("org:edit")
     public String showEditOrgForm(Model model) {
@@ -147,7 +136,7 @@ public class ManageOrgsController {
     	command.setAddress(org.getAddress());*/
     	model.addAttribute("OrganizationCommand", command);
     	
-    	return "forward:/s/org/editOrg";
+    	return "org/editOrg";
     }
     
     @RequestMapping(value="org/editOrg",method= RequestMethod.POST)
@@ -170,7 +159,7 @@ public class ManageOrgsController {
         notification.setMessage(ConfigUtil.getConfig().getString("msg.message.update"));
         model.addAttribute("Notification",notification);
     	
-    	return "org/manageOrgs";
+    	return "forward:/s/org/manageOrgs";
     }
     
     @RequestMapping(value="org/viewOrg",method= RequestMethod.GET)
